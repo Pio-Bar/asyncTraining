@@ -10,7 +10,7 @@ function receiveUserOrder(mealName) {
 function chargeCustomersCreditCard(mealName) {
   return new Promise((resolve, reject) => {
     if (mealName === "pasta") {
-     return reject(`Error processing payment for ${mealName}`);
+      return reject(`Error processing payment for ${mealName}`);
     }
     setTimeout(() => {
       console.log("Customer's credit card charged!");
@@ -29,13 +29,38 @@ function prepareOrderedMeal(mealName) {
 }
 
 function deliverOrderedMeal(mealName) {
-  setTimeout(() => {
-    console.log(`${mealName} delivered!`);
-  }, 1000);
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log(`${mealName} delivered!`);
+      resolve(mealName);
+    }, 1000);
+  });
 }
 
-receiveUserOrder("pizza")
-  .then((meal) => chargeCustomersCreditCard(meal))
-  .then((meal) => prepareOrderedMeal(meal))
-  .then((meal) => deliverOrderedMeal(meal))
-  .catch((err) => console.error(err))
+function receiveOrders(firstOrder, secondOrder) {
+  return new Promise((resolve) => {
+    setTimeout(function () {
+      console.log("Receiving orders");
+    }, 700);
+    Promise.all([firstOrder, secondOrder]).then(() => resolve());
+  });
+}
+
+function ordersProcessed() {
+  setTimeout(function () {
+    console.log("Orders processed!");
+  }, 300);
+}
+
+receiveOrders(
+  receiveUserOrder("pizza")
+    .then((meal) => chargeCustomersCreditCard(meal))
+    .then((meal) => prepareOrderedMeal(meal))
+    .then((meal) => deliverOrderedMeal(meal))
+    .catch((err) => console.error(err)),
+  receiveUserOrder("pasta")
+    .then((meal) => chargeCustomersCreditCard(meal))
+    .then((meal) => prepareOrderedMeal(meal))
+    .then((meal) => deliverOrderedMeal(meal))
+    .catch((err) => console.error(err))
+).then(ordersProcessed);
