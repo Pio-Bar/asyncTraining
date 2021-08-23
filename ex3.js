@@ -1,4 +1,4 @@
-function receiveUserOrder(mealName) {
+async function receiveUserOrder(mealName) {
   return new Promise((resolve) => {
     setTimeout(() => {
       console.log(`Order for ${mealName} received!`);
@@ -52,15 +52,17 @@ function ordersProcessed(meals) {
   }, 300);
 }
 
-receiveOrders(
-  receiveUserOrder("pizza")
-    .then((meal) => chargeCustomersCreditCard(meal))
-    .then((meal) => prepareOrderedMeal(meal))
-    .then((meal) => deliverOrderedMeal(meal))
-    .catch((err) => console.error(err)),
-  receiveUserOrder("pasta")
-    .then((meal) => chargeCustomersCreditCard(meal))
-    .then((meal) => prepareOrderedMeal(meal))
-    .then((meal) => deliverOrderedMeal(meal))
-    .catch((err) => console.error(err))
-).then((meals)=> ordersProcessed(meals));
+async function order(meal) {
+  await receiveUserOrder(meal);
+  await chargeCustomersCreditCard(meal).catch(e=>{console.error(e)})
+  await prepareOrderedMeal(meal);
+  await deliverOrderedMeal(meal);
+  return meal
+}
+
+async function placeOrders(order1,order2) {
+  const orders = await receiveOrders(order(order1), order(order2));
+  ordersProcessed(orders)
+}
+
+placeOrders('pizza', 'pasta')
