@@ -1,68 +1,57 @@
+function timeOut(message, time) {
+  return new Promise((resolve) =>
+    setTimeout(() => {
+      console.log(message);
+      resolve();
+    }, time)
+  );
+}
+
 async function receiveUserOrder(mealName) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log(`Order for ${mealName} received!`);
-      resolve(mealName);
-    }, 800);
-  });
+  await timeOut(`Order for ${mealName} received!`, 800);
+  return mealName;
 }
 
-function chargeCustomersCreditCard(mealName) {
-  return new Promise((resolve, reject) => {
-    if (mealName === "pasta") {
-      return reject(`Error processing payment for ${mealName}`);
-    }
-    setTimeout(() => {
-      console.log(`Customer's credit card charged for ${mealName}!`);
-      resolve(mealName);
-    }, 300);
-  });
+async function chargeCustomersCreditCard(mealName) {
+  if (mealName === "pasta") {
+    await Promise.reject(`Error processing payment for ${mealName}`);
+  }
+  await timeOut(`Customer's credit card charged for ${mealName}!`, 300);
+  return mealName;
 }
 
-function prepareOrderedMeal(mealName) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log(`${mealName} prepared!`);
-      resolve(mealName);
-    }, 2000);
-  });
+async function prepareOrderedMeal(mealName) {
+  await timeOut(`${mealName} prepared!`, 2000);
+  return mealName;
 }
 
-function deliverOrderedMeal(mealName) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log(`${mealName} delivered!`);
-      resolve(mealName);
-    }, 1000);
-  });
+async function deliverOrderedMeal(mealName) {
+  await timeOut(`${mealName} delivered!`, 1000);
+  return mealName;
 }
 
-function receiveOrders(firstOrder, secondOrder) {
-  return new Promise((resolve) => {
-    setTimeout(function () {
-      console.log("Receiving orders");
-    }, 700);
-    resolve(Promise.all([firstOrder, secondOrder]));
-  });
+async function receiveOrders(firstOrder, secondOrder) {
+  await timeOut("Receiving orders", 700);
+  return Promise.all([firstOrder, secondOrder]);
 }
 
 function ordersProcessed(meals) {
-  setTimeout(function () {
-    console.log(`Orders for ${meals} processed!`);
-  }, 300);
+  timeOut(`Orders for ${meals} processed!`, 300);
 }
 
 async function order(meal) {
   await receiveUserOrder(meal);
-  await chargeCustomersCreditCard(meal).catch(e=>{console.error(e)})
+  await chargeCustomersCreditCard(meal).catch((e) => {
+    console.error(e);
+  });
   await prepareOrderedMeal(meal);
   await deliverOrderedMeal(meal);
-  return meal
+  return meal;
 }
 
-async function placeOrders(order1,order2) {
+async function placeOrders(order1, order2) {
   const orders = await receiveOrders(order(order1), order(order2));
-  ordersProcessed(orders)
+  ordersProcessed(orders);
 }
 
-placeOrders('pizza', 'pasta')
+placeOrders("pizza", "pasta");
